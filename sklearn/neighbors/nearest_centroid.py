@@ -196,3 +196,15 @@ class NearestCentroid(ClassifierMixin, BaseEstimator):
         X = check_array(X, accept_sparse='csr')
         return self.classes_[pairwise_distances(
             X, self.centroids_, metric=self.metric).argmin(axis=1)]
+
+
+class NearestCentroids(NearestCentroid):
+    def __init__(self, metric='euclidean', shrink_threshold=None):
+        super().__init__(metric, shrink_threshold)
+
+    def predict(self, X, top_k=1):
+        check_is_fitted(self)
+
+        X = check_array(X, accept_sparse='csr')
+        return self.classes_[pairwise_distances(
+            X, self.centroids_, metric=self.metric).argsort(axis=1)[:, :top_k]]
